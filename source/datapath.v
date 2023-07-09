@@ -21,7 +21,7 @@ module datapath(clk,
                 reg_SEL, 
                 pc_SEL, 
                 imm_SEL, 
-                ALU_SEL,
+                ALU_MODE,
                 addrs_SEL,
 
                 pc_EN, 
@@ -41,7 +41,7 @@ module datapath(clk,
     input addrs_SEL;
     input [1:0] reg_SEL, pc_SEL;
     input [2:0] imm_SEL;
-    input [3:0] ALU_SEL;
+    input [3:0] ALU_MODE;
     input [31:0] data_mem_IN;
 
     output [31:0]   data_mem_OUT, mem_addrs; 
@@ -102,7 +102,7 @@ module datapath(clk,
     alu32 ALU (
         .a(muxrs1), 
         .b(muxrs2), 
-        .ALUControl(ALU_SEL), 
+        .ALUControl(ALU_MODE), 
         .result(ALUResults));
 
     adder #(.WIDTH(32)) ADDER_plus4 (
