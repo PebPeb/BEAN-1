@@ -1,6 +1,6 @@
 
 //
-//	tri.v
+//	tri_buf.v
 //		Adjustable data width Tri State Buffer
 //
 
@@ -10,16 +10,15 @@
 // -------------------------------- //
 //	Last Modified: 06/30/2023
 
-// Change Log:	NA
 
 
 module tri_buf(data_in, data_out, enable);
 	parameter WIDTH = 32;
 	
 	input wire [WIDTH - 1:0]	data_in;
-    input wire      			enable;
-	inout wire [WIDTH - 1:0]	data_out;
+  input wire      			    enable;
+  inout wire [WIDTH - 1:0]	data_out;
 
-    assign data_out = enable ? data_in : {WIDTH{1'bZ}};
+  assign data_out = enable ? data_in : {WIDTH{1'bZ}};
 
 endmodule

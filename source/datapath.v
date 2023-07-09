@@ -2,107 +2,155 @@
 //
 //	datapath.v
 //		RV32I datapath
+//    This datapath is for the BEAN-1.
 //
 
 // -------------------------------- //
 //	By: Bryce Keen	
 //	Created: 07/08/2023
 // -------------------------------- //
-//	Last Modified: 07/08/2023
+//	Last Modified: 07/09/2023
 
-// Change Log:	NA
 
-module datapath(clk, reset, regWE, rs1sel, 
-                rs2sel, regsel, PCsel, ImmSel, 
-                ALUControl,  Instr,  dmemData, 
-                pc, dmemrs2, ALUout);
+module datapath(clk, 
+                reset, 
+                
+                reg_WE, 
+                rs1_SEL, 
+                rs2_SEL, 
+                reg_SEL, 
+                pc_SEL, 
+                imm_SEL, 
+                ALU_SEL,
+                addrs_SEL,
+
+                pc_EN, 
+                instr_EN, 
+                ALU_mem_EN, 
+                mem_in_EN, 
+                
+                data_mem_IN,
+                data_mem_OUT,
+                mem_addrs
+                );
 
     input clk, reset;
 
-    input regWE;
-    input rs1sel, rs2sel;
-    input [1:0] regsel, PCsel;
-    input [2:0] ImmSel;
-    input [3:0] ALUControl;
-    input [31:0] Instr;
-    input [31:0] dmemData;
+    input reg_WE;
+    input rs1_SEL, rs2_SEL;
+    input addrs_SEL;
+    input [1:0] reg_SEL, pc_SEL;
+    input [2:0] imm_SEL;
+    input [3:0] ALU_SEL;
+    input [31:0] data_mem_IN;
 
-    output [31:0]   pc, dmemrs2, ALUout; 
+    output [31:0]   data_mem_OUT, mem_addrs; 
 
-    wire [31:0]     PC_now, PC_next;
+    wire [31:0]     data_bus;
+
+    wire [31:0]     Instr;
+    wire [31:0]     PC_now, PC_next, pc;
     wire [31:0]     rdout1, rdout2, wrs3;
     wire [31:0]     ExtImm, muxrs1, muxrs2;
     wire [31:0]     ALUResults;
     wire [31:0]     pcplus4, pcPlusImm;
+
+
+    flopren #(.WIDTH(32)) REG_instr (
+        .d(data_bus), 
+        .q(Instr), 
+        .clk(clk), 
+        .enable(instr_EN),
+        .reset(reset));
 
     regfile regFILE (
         .rs1(Instr[19:15]),
         .rs2(Instr[24:20]),
         .wrs3(wrs3),
         .rd(Instr[11:7]),
-        .we(regWE),
+        .we(reg_WE),
         .clk(clk),
         .reset(reset),
         .rdout1(rdout1),
         .rdout2(rdout2));
-    assign dmemrs2 = rdout2;
 
-    flopr #(.WIDTH(32)) pcREG (
+    flopren #(.WIDTH(32)) REG_pc (
         .d(PC_now), 
         .q(PC_next), 
         .clk(clk), 
+        .enable(pc_EN),
         .reset(reset));
     assign pc = PC_next;
 
-    extend extendImm(
+    extend EXTND_Imm(
         .Instr(Instr[31:7]), 
-        .ImmSrc(ImmSel), 
+        .ImmSrc(imm_SEL), 
         .ExtImm(ExtImm));
 
-    mux2 #(.WIDTH(32)) MUXrs1 (
+    mux2 #(.WIDTH(32)) MUX_rs1 (
         .a(rdout1), 
-        .b(PC_next), 
-        .sel(rs1sel), 
+        .b(pc), 
+        .sel(rs1_SEL), 
         .y(muxrs1));
 
-    mux2 #(.WIDTH(32)) MUXrs2 (
+    mux2 #(.WIDTH(32)) MUX_rs2 (
         .a(rdout2), 
         .b(ExtImm), 
-        .sel(rs2sel), 
+        .sel(rs2_SEL), 
         .y(muxrs2));
 
-    alu32 alu (
+    alu32 ALU (
         .a(muxrs1), 
         .b(muxrs2), 
-        .ALUControl(ALUControl), 
+        .ALUControl(ALU_SEL), 
         .result(ALUResults));
-    assign ALUout = ALUResults;
 
-    adder #(.WIDTH(32)) plus4 (
+    adder #(.WIDTH(32)) ADDER_plus4 (
         .a(4), 
-        .b(PC_next), 
+        .b(pc), 
         .y(pcplus4));
 
-    mux4 #(.WIDTH(32)) regmux (
-        .a(dmemData),
+    mux4 #(.WIDTH(32)) MUX_regfile (
+        .a(data_bus),
         .b(ALUResults),
         .c(ExtImm),
         .d(pcplus4),
-        .sel(regsel), 
+        .sel(reg_SEL), 
         .y(wrs3));
 
-    mux4 #(.WIDTH(32)) pcmux (
+    mux4 #(.WIDTH(32)) MUX_pc (
         .a(pcplus4),
         .b(ALUResults),
         .c(pcPlusImm),
         .d(32'hXXXXXXXX),
-        .sel(PCsel), 
+        .sel(pc_SEL), 
         .y(PC_now));
 
-    adder #(.WIDTH(32)) adderImm (
-        .a(PC_next), 
+    adder #(.WIDTH(32)) ADDER_Imm (
+        .a(pc), 
         .b(ExtImm), 
         .y(pcPlusImm));
+
+
+    mux2 #(.WIDTH(32)) MUX_mem_addrs (
+        .a(rdout2), 
+        .b(pc), 
+        .sel(addrs_SEL), 
+        .y(mem_addrs));
+
+    assign data_mem_OUT = data_bus;
+
+    tri_buf #(.WIDTH(32)) TRIBUF_mem (
+      .data_in(data_mem_IN), 
+      .data_out(data_bus), 
+      .enable(mem_in_EN)
+    )
+
+    tri_buf #(.WIDTH(32)) TRIBUF_ALU (
+      .data_in(ALUResults), 
+      .data_out(data_bus), 
+      .enable(ALU_mem_EN)
+    )
 
 endmodule
 

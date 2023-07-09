@@ -1,7 +1,7 @@
 
 //
-//	dmem.v
-//		Data Memory
+//	mem.v
+//		1, 2, and 4 byte addressable memory 
 //
 
 // -------------------------------- //
@@ -14,7 +14,7 @@
 //		11/01/2022 - Added Reset, modes, changed memory to byte addressable
 
 
-module dmem(a, rd, wd, clk, we, mode, reset);
+module mem(a, rd, wd, clk, we, mode, reset);
 	input wire 			clk, we, reset;
 	input wire [2:0]	mode;
 	input wire [31:0]	a, wd;
