@@ -8,25 +8,34 @@
 //	By: Bryce Keen	
 //	Created: 10/08/2022
 // -------------------------------- //
-//	Last Modified: 11/01/2022
+//	Last Modified: 07/09/2023
 
 // Change Log:
 //		11/01/2022 - Added Reset, modes, changed memory to byte addressable
+//    07/09/2023 - Added Data initialization & removed reset
 
-
-module mem(a, rd, wd, clk, we, mode, reset);
-	input wire 			clk, we, reset;
+module mem(a, rd, wd, clk, we, mode);
+	input wire 			clk, we;
 	input wire [2:0]	mode;
 	input wire [31:0]	a, wd;
 	output reg [31:0]	rd = 0;
 	
 	reg [7:0] mem [0:255];
 	
+	parameter INITIAL_DATA_PATH = "../../source/mem.dat";
+	parameter LOAD_DATA = 1;
+
 	integer i;
 	initial begin
-		for (i = 0; i < 256; i = i + 1) begin
-			mem[i] <= 8'h00;
-		end		
+		if (LOAD_DATA) begin
+      $readmemh(INITIAL_DATA_PATH, mem);
+		end
+		else begin
+			for (i = 0; i < 256; i = i + 1) begin
+				mem[i] <= 8'h00;
+			end		
+		end
+
 	end
 		
   // Write
@@ -55,12 +64,12 @@ module mem(a, rd, wd, clk, we, mode, reset);
 		endcase
 	end
 	
-	always @(posedge clk, reset) begin
-		if (reset) begin
-			for (i = 0; i < 256; i = i + 1) begin
-				mem[i] <= 8'h00;
-			end	
-		end
-	end	
+	// always @(posedge clk, reset) begin
+	// 	if (reset) begin
+	// 		for (i = 0; i < 256; i = i + 1) begin
+	// 			mem[i] <= 8'h00;
+	// 		end	
+	// 	end
+	// end	
 	
 endmodule

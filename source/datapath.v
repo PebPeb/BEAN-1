@@ -39,6 +39,7 @@ module datapath(clk,
     input reg_WE;
     input rs1_SEL, rs2_SEL;
     input addrs_SEL;
+    input pc_EN, instr_EN, ALU_mem_EN, mem_in_EN;
     input [1:0] reg_SEL, pc_SEL;
     input [2:0] imm_SEL;
     input [3:0] ALU_MODE;
@@ -144,13 +145,13 @@ module datapath(clk,
       .data_in(data_mem_IN), 
       .data_out(data_bus), 
       .enable(mem_in_EN)
-    )
+    );
 
     tri_buf #(.WIDTH(32)) TRIBUF_ALU (
       .data_in(ALUResults), 
       .data_out(data_bus), 
       .enable(ALU_mem_EN)
-    )
+    );
 
 endmodule
 

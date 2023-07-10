@@ -1,6 +1,6 @@
 
 //
-//	flopr.v
+//	flopren.v
 //		Enabled Resetable flip-flop
 //
 
@@ -8,10 +8,10 @@
 //	By: Bryce Keen	
 //	Created: 06/30/2022
 // -------------------------------- //
-//	Last Modified: 06/30/2023
+//	Last Modified: 07/09/2023
 
 
-module flopr(d, q, clk, enable, reset);
+module flopren(d, q, clk, enable, reset);
 	parameter WIDTH = 32;
 	parameter INIT = 0;
 
