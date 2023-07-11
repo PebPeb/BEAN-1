@@ -1,6 +1,6 @@
 
 
-module datapath_tb();
+module control_logic_tb();
   reg clk;
   reg reset;
 
