@@ -92,359 +92,109 @@ module control_logic(
             7'b1101111:   control_bus <= 20'b10011101000000000000;      // JAL
             7'b1100111:   control_bus <= 20'b10111010111101000000;      // JALR
             7'b1100011:
+              case (funct3)
+                3'b000: control_bus <= {5'b00000, (jump == 1'b1) ? 2'b10 : 2'b00, 13'b0101000000000};  // BEQ
+                3'b001: control_bus <= {5'b00000, (jump == 1'b0) ? 2'b10 : 2'b00, 13'b0101000000000};  // BNE
+                3'b100: control_bus <= {5'b00000, (jump == 1'b1) ? 2'b10 : 2'b00, 13'b0101010000000};  // BLT
+                3'b101: control_bus <= {5'b00000, (jump == 1'b1) ? 2'b10 : 2'b00, 13'b0101100000000};  // BGE
+                3'b110: control_bus <= {5'b00000, (jump == 1'b1) ? 2'b10 : 2'b00, 13'b0101001000000};  // BLTU
+                3'b111: control_bus <= {5'b00000, (jump == 1'b1) ? 2'b10 : 2'b00, 13'b0101011000000};  // BGEU
+              endcase
+            7'b0000011:
+              case (funct3)
+                3'b000:  control_bus <= 20'b10100000110000010110;      // LB
+                3'b001:  control_bus <= 20'b10100000110000010101;      // LH
+                3'b010:  control_bus <= 20'b10100000110000010000;      // LW
+                3'b100:  control_bus <= 20'b10100000110000010010;      // LBU
+                3'b101:  control_bus <= 20'b10100000110000010001;      // LHU
+              endcase
+            7'b0100011:
+              case (funct3)
+                3'b000:  control_bus <= 20'b00100000010000101010;      // SB
+                3'b001:  control_bus <= 20'b00100000010000101001;      // SH
+                3'b010:  control_bus <= 20'b00100000010000101000;      // SW
+              endcase
+            7'b0010011:
               begin
+                control_bus[19:10] <= 10'b1010100011;
+                control_bus[5:0] <= 6'b000000; 
                 case (funct3)
-                  3'b000: control_bus <= {5'b00000, (jump == 1'b1) ? 2'b10 : 2'b00, 13'b0101000000000};  // BEQ
-                  3'b001: control_bus <= {5'b00000, (jump == 1'b0) ? 2'b10 : 2'b00, 13'b0101000000000};  // BNE
+                  3'b000:   control_bus[9:6] <= 4'b0000;   // ADDI
+                  3'b010:   control_bus[9:6] <= 4'b1010;   // SLTI
+                  3'b011:   control_bus[9:6] <= 4'b1001;   // SLTIU
+                  3'b100:   control_bus[9:6] <= 4'b0100;   // XORI
+                  3'b110:   control_bus[9:6] <= 4'b0011;   // ORI
+                  3'b111:   control_bus[9:6] <= 4'b0010;   // ANDI
+                  3'b001:
+                    case (funct7)
+                      7'b0000000:   control_bus[9:6] <= 4'b0101;   // SLLI
+                    endcase
+                  3'b101:
+                    case (funct7)
+                      7'b0000000:   control_bus[9:6] <= 4'b0110;   // SRLI
+                      7'b0100000:   control_bus[9:6] <= 4'b0111;   // SRAI
+                    endcase
                 endcase
               end
+              7'b0110011:
+                begin
+                  control_bus[19:10] <= 10'b1000100011;
+                  control_bus[5:0] <= 6'b000000; 
+                  case (funct3)
+                    3'b000:
+                      case (funct7)
+                        7'b0000000:   control_bus[9:6] <= 4'b0000;   // ADD
+                        7'b0100000:   control_bus[9:6] <= 4'b0001;   // SUB
+                      endcase
+                    3'b001:
+                      case (funct7)
+                        7'b0000000:   control_bus[9:6] <= 4'b0101;   // SLL
+                      endcase
+                    3'b010:
+                      case (funct7)
+                        7'b0000000:   control_bus[9:6] <= 4'b1010;   // SLT
+                      endcase                      
+                  endcase
+                end
           endcase
         end
     endcase
 
+					
+			
 
-      //                 3'b100:     // BLT
-      //                     /*  BLT take the branch if rs1 is less than rs2, using
-      //                     signed comparison */
-      //                     begin
-      //                         mem_MODE    <= 3'b000;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b0;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b0;
-      //                         regSEL      <= 2'b00;
-      //                         pcSEL       <= (jump == 1'b1) ? 2'b10 : 2'b00;
-      //                         immSEL      <= 3'b010;
-      //                         ALU_MODE  <= 4'b1010;
-      //                     end
-      //                 3'b101:     // BGE
-      //                     /* BGE take the branch if rs1 is greater than or equal to rs2, 
-      //                     using signed comparison */
-      //                     begin
-      //                         mem_MODE    <= 3'b000;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b0;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b0;
-      //                         regSEL      <= 2'b00;
-      //                         pcSEL       <= (jump == 1'b1) ? 2'b10 : 2'b00;
-      //                         immSEL      <= 3'b010;
-      //                         ALU_MODE  <= 4'b1100;
-      //                     end
-      //                 3'b110:     // BLTU
-      //                     /*  BLTU take the branch if rs1 is less than rs2, using
-      //                     unsigned comparison */
-      //                     begin
-      //                         mem_MODE    <= 3'b000;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b0;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b0;
-      //                         regSEL      <= 2'b00;
-      //                         pcSEL       <= (jump == 1'b1) ? 2'b10 : 2'b00;
-      //                         immSEL      <= 3'b010;
-      //                         ALU_MODE  <= 4'b1001;
-      //                     end
-      //                 3'b111:     // BGEU
-      //                     /* BGEU take the branch if rs1 is greater than or equal to rs2, 
-      //                     using unsigned comparison */
-      //                     begin
-      //                         mem_MODE    <= 3'b000;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b0;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b0;
-      //                         regSEL      <= 2'b00;
-      //                         pcSEL       <= (jump == 1'b1) ? 2'b10 : 2'b00;
-      //                         immSEL      <= 3'b010;
-      //                         ALU_MODE  <= 4'b1011;
-      //                     end
-      //             endcase
-      //         end
-      //     7'b0000011:
-      //         begin
-      //             case (funct3)
-      //                 3'b000:     // LB
-      //                     begin
-      //                         mem_MODE    <= 3'b110;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b1;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b00;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b011;
-      //                         ALU_MODE  <= 4'b0000;
-      //                     end
-      //                 3'b001:     // LH
-      //                     begin
-      //                         mem_MODE    <= 3'b101;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b1;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b00;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b011;
-      //                         ALU_MODE  <= 4'b0000;
-      //                     end
-      //                 3'b010:     // LW
-      //                     begin
-      //                         mem_MODE    <= 3'b000;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b1;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b00;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b011;
-      //                         ALU_MODE  <= 4'b0000;
-      //                     end
-      //                 3'b100:     // LBU
-      //                     begin
-      //                         mem_MODE    <= 3'b010;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b1;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b00;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b011;
-      //                         ALU_MODE  <= 4'b0000;
-      //                     end
-      //                 3'b101:     // LHU
-      //                     begin
-      //                         mem_MODE    <= 3'b001;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b1;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b00;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b011;
-      //                         ALU_MODE  <= 4'b0000;
-      //                     end
-      //             endcase
-      //         end
-      //     7'b0100011:
-      //         begin
-      //             case (funct3)
-      //                 3'b000:     // SB
-      //                     begin
-      //                         mem_MODE    <= 3'b010;
-      //                         dmemWE      <= 1'b1;
-      //                         regWE       <= 1'b0;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b00;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b001;
-      //                         ALU_MODE  <= 4'b0000;
-      //                     end
-      //                 3'b001:     // SH
-      //                     begin
-      //                         mem_MODE    <= 3'b001;
-      //                         dmemWE      <= 1'b1;
-      //                         regWE       <= 1'b0;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b00;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b001;
-      //                         ALU_MODE  <= 4'b0000;
-      //                     end
-      //                 3'b010:     // SW
-      //                     begin
-      //                         mem_MODE    <= 3'b000;
-      //                         dmemWE      <= 1'b1;
-      //                         regWE       <= 1'b0;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b00;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b001;
-      //                         ALU_MODE  <= 4'b0000;
-      //                     end
-      //             endcase
-      //         end
+
+
       //     7'b0010011:
       //         begin
       //             case (funct3)
       //                 3'b000:     // ADDI
-      //                     begin
-      //                         mem_MODE    <= 3'b000;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b1;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b01;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b011;
-      //                         ALU_MODE  <= 4'b0000;
-      //                     end
       //                 3'b010:     // SLTI
-      //                     begin
-      //                         mem_MODE    <= 3'b000;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b1;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b01;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b011;
-      //                         ALU_MODE  <= 4'b1010;
-      //                     end
       //                 3'b011:     // SLTIU
-      //                     begin
-      //                         mem_MODE    <= 3'b000;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b1;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b01;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b011;
-      //                         ALU_MODE  <= 4'b1001;
-      //                     end
       //                 3'b100:     // XORI
-      //                     begin
-      //                         mem_MODE    <= 3'b000;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b1;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b01;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b011;
-      //                         ALU_MODE  <= 4'b0100;
-      //                     end
       //                 3'b110:     // ORI
-      //                     begin
-      //                         mem_MODE    <= 3'b000;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b1;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b01;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b011;
-      //                         ALU_MODE  <= 4'b0011;
-      //                     end
       //                 3'b111:     // ANDI
-      //                     begin
-      //                         mem_MODE    <= 3'b000;
-      //                         dmemWE      <= 1'b0;
-      //                         regWE       <= 1'b1;
-      //                         rs1SEL      <= 1'b0;
-      //                         rs2SEL      <= 1'b1;
-      //                         regSEL      <= 2'b01;
-      //                         pcSEL       <= 2'b00;
-      //                         immSEL      <= 3'b011;
-      //                         ALU_MODE  <= 4'b0010;
-      //                     end
       //                 3'b001:
       //                     case (funct7)
       //                         7'b0000000:     // SLLI
-      //                             begin
-      //                                 mem_MODE    <= 3'b000;
-      //                                 dmemWE      <= 1'b0;
-      //                                 regWE       <= 1'b1;
-      //                                 rs1SEL      <= 1'b0;
-      //                                 rs2SEL      <= 1'b1;
-      //                                 regSEL      <= 2'b01;
-      //                                 pcSEL       <= 2'b00;
-      //                                 immSEL      <= 3'b011;
-      //                                 ALU_MODE  <= 4'b0101;
-      //                             end
       //                     endcase
       //                 3'b101:     
       //                     case (funct7)
       //                         7'b0000000:     // SRLI
-      //                             begin
-      //                                 mem_MODE    <= 3'b000;
-      //                                 dmemWE      <= 1'b0;
-      //                                 regWE       <= 1'b1;
-      //                                 rs1SEL      <= 1'b0;
-      //                                 rs2SEL      <= 1'b1;
-      //                                 regSEL      <= 2'b01;
-      //                                 pcSEL       <= 2'b00;
-      //                                 immSEL      <= 3'b011;
-      //                                 ALU_MODE  <= 4'b0110;
-      //                             end
       //                         7'b0100000:     // SRAI
-      //                             begin
-      //                                 mem_MODE    <= 3'b000;
-      //                                 dmemWE      <= 1'b0;
-      //                                 regWE       <= 1'b1;
-      //                                 rs1SEL      <= 1'b0;
-      //                                 rs2SEL      <= 1'b1;
-      //                                 regSEL      <= 2'b01;
-      //                                 pcSEL       <= 2'b00;
-      //                                 immSEL      <= 3'b011;
-      //                                 ALU_MODE  <= 4'b0111;
-      //                             end
       //                     endcase
       //             endcase
       //         end
       //     7'b0110011:
       //         case (funct3)
       //             3'b000:
-      //                 case (funct7)
       //                     7'b0000000:     // ADD
-      //                         begin
-      //                             mem_MODE    <= 3'b000;
-      //                             dmemWE      <= 1'b0;
-      //                             regWE       <= 1'b1;
-      //                             rs1SEL      <= 1'b0;
-      //                             rs2SEL      <= 1'b0;
-      //                             regSEL      <= 2'b01;
-      //                             pcSEL       <= 2'b00;
-      //                             immSEL      <= 3'b000;
-      //                             ALU_MODE  <= 4'b0000;
-      //                         end
       //                     7'b0100000:     // SUB
-      //                         begin
-      //                             mem_MODE    <= 3'b000;
-      //                             dmemWE      <= 1'b0;
-      //                             regWE       <= 1'b1;
-      //                             rs1SEL      <= 1'b0;
-      //                             rs2SEL      <= 1'b0;
-      //                             regSEL      <= 2'b01;
-      //                             pcSEL       <= 2'b00;
-      //                             immSEL      <= 3'b000;
-      //                             ALU_MODE  <= 4'b0001;
-      //                         end
-      //                 endcase
       //             3'b001:
-      //                 case (funct7)
       //                     7'b0000000:     // SLL
-      //                         begin
-      //                             mem_MODE    <= 3'b000;
-      //                             dmemWE      <= 1'b0;
-      //                             regWE       <= 1'b1;
-      //                             rs1SEL      <= 1'b0;
-      //                             rs2SEL      <= 1'b0;
-      //                             regSEL      <= 2'b01;
-      //                             pcSEL       <= 2'b00;
-      //                             immSEL      <= 3'b000;
-      //                             ALU_MODE  <= 4'b0101;
-      //                         end
-      //                 endcase
       //             3'b010:
       //                 case (funct7)
       //                     7'b0000000:     // SLT
-      //                         begin
-      //                             mem_MODE    <= 3'b000;
-      //                             dmemWE      <= 1'b0;
-      //                             regWE       <= 1'b1;
-      //                             rs1SEL      <= 1'b0;
-      //                             rs2SEL      <= 1'b0;
-      //                             regSEL      <= 2'b01;
-      //                             pcSEL       <= 2'b00;
-      //                             immSEL      <= 3'b000;
-      //                             ALU_MODE  <= 4'b1010;
-      //                         end
-      //                 endcase
       //             3'b011:
       //                 case (funct7)
       //                     7'b0000000:     // SLTU
