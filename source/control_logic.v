@@ -177,6 +177,7 @@ module control_logic(
                       endcase                    
                   endcase
                 end
+              default:   control_bus <= 20'b00000000000000000000;
           endcase
         end
     endcase

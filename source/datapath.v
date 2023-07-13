@@ -14,7 +14,6 @@
 
 module datapath(clk, 
                 reset, 
-                
                 reg_WE, 
                 rs1_SEL, 
                 rs2_SEL, 
@@ -23,15 +22,15 @@ module datapath(clk,
                 imm_SEL, 
                 ALU_MODE,
                 addrs_SEL,
-
                 pc_EN, 
                 instr_EN, 
                 ALU_mem_EN, 
                 mem_in_EN, 
-                
                 data_mem_IN,
                 data_mem_OUT,
-                mem_addrs
+                mem_addrs,
+                instr,
+                jump
                 );
 
     input clk, reset;
@@ -45,7 +44,9 @@ module datapath(clk,
     input [3:0] ALU_MODE;
     input [31:0] data_mem_IN;
 
+    output wire         jump;
     output [31:0]   data_mem_OUT, mem_addrs; 
+    output wire [31:0]  instr;
 
     wire [31:0]     data_bus;
 
@@ -63,6 +64,7 @@ module datapath(clk,
         .clk(clk), 
         .enable(instr_EN),
         .reset(reset));
+    assign instr = Instr;
 
     regfile regFILE (
         .rs1(Instr[19:15]),
@@ -105,6 +107,7 @@ module datapath(clk,
         .b(muxrs2), 
         .ALUControl(ALU_MODE), 
         .result(ALUResults));
+    assign jump = ALUResults[0];
 
     adder #(.WIDTH(32)) ADDER_plus4 (
         .a(4), 
