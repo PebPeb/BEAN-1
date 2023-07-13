@@ -153,14 +153,34 @@ module control_logic(
                     3'b010:
                       case (funct7)
                         7'b0000000:   control_bus[9:6] <= 4'b1010;   // SLT
-                      endcase                      
+                      endcase   
+                    3'b011:
+                      case (funct7)
+                        7'b0000000:   control_bus[9:6] <= 4'b1001;   // SLTU
+                      endcase
+                    3'b100:   
+                      case (funct7)
+                        7'b0000000:   control_bus[9:6] <= 4'b0100;   // XOR
+                      endcase   
+                    3'b101:
+                      case (funct7)
+                        7'b0000000:   control_bus[9:6] <= 4'b0110;   // SRL
+                        7'b0100000:   control_bus[9:6] <= 4'b0111;   // SRA
+                      endcase  
+                    3'b110:
+                      case (funct7)
+                        7'b0000000:   control_bus[9:6] <= 4'b0011;   // OR
+                      endcase 
+                    3'b111:
+                      case (funct7)
+                        7'b0000000:   control_bus[9:6] <= 4'b0010;   // AND
+                      endcase                    
                   endcase
                 end
           endcase
         end
     endcase
 
-					
 			
 
 
@@ -198,60 +218,13 @@ module control_logic(
       //             3'b011:
       //                 case (funct7)
       //                     7'b0000000:     // SLTU
-      //                         begin
-      //                             mem_MODE    <= 3'b000;
-      //                             dmemWE      <= 1'b0;
-      //                             regWE       <= 1'b1;
-      //                             rs1SEL      <= 1'b0;
-      //                             rs2SEL      <= 1'b0;
-      //                             regSEL      <= 2'b01;
-      //                             pcSEL       <= 2'b00;
-      //                             immSEL      <= 3'b000;
-      //                             ALU_MODE  <= 4'b1001;
-      //                         end
-      //                 endcase
       //             3'b100:
       //                 case (funct7)
       //                     7'b0000000:     // XOR
-      //                         begin
-      //                             mem_MODE    <= 3'b000;
-      //                             dmemWE      <= 1'b0;
-      //                             regWE       <= 1'b1;
-      //                             rs1SEL      <= 1'b0;
-      //                             rs2SEL      <= 1'b0;
-      //                             regSEL      <= 2'b01;
-      //                             pcSEL       <= 2'b00;
-      //                             immSEL      <= 3'b000;
-      //                             ALU_MODE  <= 4'b0100;
-      //                         end
-      //                 endcase
       //             3'b101:
       //                 case (funct7)
       //                     7'b0000000:     // SRL
-      //                         begin
-      //                             mem_MODE    <= 3'b000;
-      //                             dmemWE      <= 1'b0;
-      //                             regWE       <= 1'b1;
-      //                             rs1SEL      <= 1'b0;
-      //                             rs2SEL      <= 1'b0;
-      //                             regSEL      <= 2'b01;
-      //                             pcSEL       <= 2'b00;
-      //                             immSEL      <= 3'b000;
-      //                             ALU_MODE  <= 4'b0110;
-      //                         end
       //                     7'b0100000:     // SRA
-      //                         begin
-      //                             mem_MODE    <= 3'b000;
-      //                             dmemWE      <= 1'b0;
-      //                             regWE       <= 1'b1;
-      //                             rs1SEL      <= 1'b0;
-      //                             rs2SEL      <= 1'b0;
-      //                             regSEL      <= 2'b01;
-      //                             pcSEL       <= 2'b00;
-      //                             immSEL      <= 3'b000;
-      //                             ALU_MODE  <= 4'b0111;
-      //                         end
-      //                 endcase
       //             3'b110:
       //                 case (funct7)
       //                     7'b0000000:     // OR
