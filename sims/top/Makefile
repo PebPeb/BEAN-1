@@ -3,14 +3,14 @@ all: build launch
 
 
 build:
-	iverilog -o control_logic_tb.out control_logic_tb.v ../../source/*.v
-	vvp control_logic_tb.out
+	iverilog -o top_tb.out top_tb.v ../../source/*.v
+	vvp top_tb.out
 
 launch:
-	gtkwave control_logic_tb.vcd
+	gtkwave top_tb.vcd
 
 clean:
-	rm -f control_logic_tb.out
-	rm -f control_logic_tb.vcd
+	rm -f top_tb.out
+	rm -f top_tb.vcd
 
 
