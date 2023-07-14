@@ -24,6 +24,12 @@ module regfile(rs1, rs2, wrs3, rd, we, clk, reset, rdout1, rdout2);
 	assign rdout2 = x[rs2];
 	
 	integer i = 0;
+	initial begin
+		for (i = 0; i < 32; i = i + 1) begin 
+			x[i] <= 0;
+		end
+	end
+
 	always @(posedge clk, posedge reset) begin
 		if (reset) begin						// Reset
 			for (i = 0; i < 32; i = i + 1) begin 

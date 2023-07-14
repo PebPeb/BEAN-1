@@ -16,9 +16,12 @@ module top_tb();
     $finish;
   end
 
+  integer i;
   initial begin
     $dumpfile("top_tb.vcd");
     $dumpvars(0, top_tb);
+    for (i = 0; i < 32; i = i + 1)
+      $dumpvars(1, DUT.CPU.data_unit.regFILE.x[i]);
   end
 endmodule
 
