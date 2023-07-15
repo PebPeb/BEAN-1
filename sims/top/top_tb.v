@@ -12,7 +12,7 @@ module top_tb();
   );
 
   initial begin
-    #20
+    #200
     $finish;
   end
 
