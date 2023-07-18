@@ -137,7 +137,7 @@ module datapath(clk,
 
 
     mux2 #(.WIDTH(32)) MUX_mem_addrs (
-        .a(rdout2), 
+        .a(ALUResults),
         .b(pc), 
         .sel(addrs_SEL), 
         .y(mem_addrs));
@@ -150,8 +150,8 @@ module datapath(clk,
       .enable(mem_in_EN)
     );
 
-    tri_buf #(.WIDTH(32)) TRIBUF_ALU (
-      .data_in(ALUResults), 
+    tri_buf #(.WIDTH(32)) TRIBUF_rs2 (
+      .data_in(rdout2), 
       .data_out(data_bus), 
       .enable(ALU_mem_EN)
     );

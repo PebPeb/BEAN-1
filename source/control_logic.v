@@ -62,6 +62,7 @@ module control_logic(
     mem_MODE} = control_bus;
 
 
+
   assign { addrs_SEL, pc_EN, instr_EN} = state_control;
 
   // Need to account for reset
