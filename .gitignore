@@ -2,7 +2,9 @@
 
 *.bkp
 *.dtmp
+# GTKWave
 *.out
 *.vcd
+*.gtkw
 
 RISC-V-Programs/
