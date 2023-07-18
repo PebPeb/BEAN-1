@@ -9,7 +9,9 @@
 //	By: Bryce Keen	
 //	Created: 07/08/2023
 // -------------------------------- //
-//	Last Modified: 07/09/2023
+//	Last Modified: 07/18/2023
+
+// Fixed load and store instructions
 
 
 module datapath(clk, 
