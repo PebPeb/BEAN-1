@@ -20,7 +20,7 @@ module mem(a, rd, wd, clk, we, mode);
 	input wire [31:0]	a, wd;
 	output reg [31:0]	rd = 0;
 	
-	reg [7:0] mem [0:255];
+	reg [7:0] mem [0:1023];
 	
 	parameter INITIAL_DATA_PATH = "../../source/mem.dat";
 	parameter LOAD_DATA = 1;

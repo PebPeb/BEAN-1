@@ -22,7 +22,7 @@ module top_tb();
     $dumpvars(0, top_tb);
     for (i = 0; i < 32; i = i + 1)
       $dumpvars(1, DUT.CPU.data_unit.regFILE.x[i]);
-    for (i = 0; i < 256; i = i + 1)
+    for (i = 0; i < 1024; i = i + 1)
       $dumpvars(1, DUT.memory.mem[i]);
   end
 endmodule
