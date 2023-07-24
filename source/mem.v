@@ -20,7 +20,9 @@ module mem(a, rd, wd, clk, we, mode);
 	input wire [31:0]	a, wd;
 	output reg [31:0]	rd = 0;
 	
-	reg [7:0] mem [0:1023];
+	parameter SIZE_BYTES = 1024;
+
+	reg [7:0] mem [0:SIZE_BYTES - 1];
 	
 	parameter INITIAL_DATA_PATH = "../../source/mem.dat";
 	parameter LOAD_DATA = 1;
@@ -31,7 +33,7 @@ module mem(a, rd, wd, clk, we, mode);
       $readmemh(INITIAL_DATA_PATH, mem);
 		end
 		else begin
-			for (i = 0; i < 256; i = i + 1) begin
+			for (i = 0; i < SIZE_BYTES; i = i + 1) begin
 				mem[i] <= 8'h00;
 			end		
 		end
